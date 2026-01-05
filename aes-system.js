@@ -42,27 +42,42 @@ function decryptAES(ciphertext, secretKey, ivHex) {
     return decrypted;
 }
 
-// User Input Flow 
-rl.question("Enter plaintext message: ", (plaintext) => {
-    rl.question("Enter secret key (min 128-bit recommended): ", (secretKey) => {
+// Ask user whether to encrypt or decrypt
+rl.question("Do you want to encrypt or decrypt? (e/d): ", (choice) => {
+    if (choice.toLowerCase() === 'e') {
+        // Encryption flow
+        rl.question("Enter plaintext message: ", (plaintext) => {
+            rl.question("Enter secret key (min 128-bit recommended): ", (secretKey) => {
 
-        // Encrypt the message
-        const encryptedData = encryptAES(plaintext, secretKey);
+                const encryptedData = encryptAES(plaintext, secretKey);
 
-        console.log("\n--- Encryption Output ---");
-        console.log("Ciphertext:", encryptedData.ciphertext);
-        console.log("IV:", encryptedData.iv);
+                console.log("\n--- Encryption Output ---");
+                console.log("Ciphertext:", encryptedData.ciphertext);
+                console.log("IV:", encryptedData.iv);
 
-        // Decrypt the message
-        const decryptedText = decryptAES(
-            encryptedData.ciphertext,
-            secretKey,
-            encryptedData.iv
-        );
+                rl.close();
+            });
+        });
+    } else if (choice.toLowerCase() === 'd') {
+        // Decryption flow
+        rl.question("Enter ciphertext: ", (ciphertext) => {
+            rl.question("Enter IV: ", (iv) => {
+                rl.question("Enter secret key: ", (secretKey) => {
 
-        console.log("\n--- Decryption Output ---");
-        console.log("Decrypted Text:", decryptedText);
+                    try {
+                        const decryptedText = decryptAES(ciphertext, secretKey, iv);
+                        console.log("\n--- Decryption Output ---");
+                        console.log("Original Text:", decryptedText);
+                    } catch (err) {
+                        console.error("Decryption failed. Check your inputs.", err.message);
+                    }
 
+                    rl.close();
+                });
+            });
+        });
+    } else {
+        console.log("Invalid choice. Please run the program again and type 'e' or 'd'.");
         rl.close();
-    });
+    }
 });
